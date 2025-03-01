@@ -46,7 +46,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build-icons": "./optimize-icons.sh",
+    "build-icons": "icon-gen -i icon.png -o icons",
     "build:mac": "bun run build-icons && electron-builder --mac --universal -c.mac.identity=null",
     "build:win": "bun run build-icons && electron-builder --win",
     "build:linux": "bun run build-icons && electron-builder --linux"

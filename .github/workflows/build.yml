@@ -1,5 +1,8 @@
 name: Build and Release
 
+# This workflow requires permission set to write on:
+# https://github.com/jacklehamster/hamster-run/settings/actions
+
 on:
   push:
     branches:
@@ -49,10 +52,10 @@ jobs:
             });
             const release = releases.find(r => r.tag_name === process.env.TAG_NAME);
             if (release) {
-              core.setOutput('release_exists', 'true');
-              core.setOutput('upload_url', release.upload_url);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_exists=true\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `upload_url=${release.upload_url}\n`);
             } else {
-              core.setOutput('release_exists', 'false');
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_exists=false\n`);
             }
 
       - name: Create Release
@@ -154,6 +157,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/power-troll-1.0.0.zip
+          asset_path: dist/hamster-run-1.0.0.zip
           asset_name: linux-build.zip
           asset_content_type: application/zip
