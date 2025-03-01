@@ -28,11 +28,12 @@
     },
     "files": [
       "*.png",
-      "js/*.js",
+      "index.js",
       "index.html",
       "main.js",
       "package.json",
-      "icon.png"
+      "icon.png",
+      "icons/*.*"
     ]
   },
   "devDependencies": {
