@@ -1,0 +1,54 @@
+{
+  "name": "hamster-run",
+  "version": "1.0.0",
+  "description": "A game about a hamster running",
+  "author": {
+    "name": "Jack Le Hamster",
+    "email": "jacklehamster@gmail.com"
+  },
+  "main": "main.js",
+  "build": {
+    "appId": "net.dobuki.hamster-run",
+    "mac": {
+      "target": "zip",
+      "category": "public.app-category.games",
+      "icon": "icons/app.icns"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "icons/app.ico"
+    },
+    "linux": {
+      "target": "zip",
+      "icon": "icon.png"
+    },
+    "portable": {
+      "unicode": false,
+      "artifactName": "hamster_run.exe"
+    },
+    "files": [
+      "*.png",
+      "js/*.js",
+      "index.html",
+      "main.js",
+      "package.json",
+      "icon.png"
+    ]
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8",
+    "icon-gen": "^5.0.0",
+    "imageoptim-cli": "^3.1.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build-icons": "./optimize-icons.sh",
+    "build:mac": "bun run build-icons && electron-builder --mac --universal -c.mac.identity=null",
+    "build:win": "bun run build-icons && electron-builder --win",
+    "build:linux": "bun run build-icons && electron-builder --linux"
+  }
+}
