@@ -129,7 +129,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/The Supernatural Power Troll-1.0.0-universal-mac.zip
+          asset_path: dist/hamster-run-1.0.0-universal-mac.zip
           asset_name: macos-build.zip
           asset_content_type: application/zip
 

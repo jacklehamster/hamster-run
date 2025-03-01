@@ -47,7 +47,7 @@
   },
   "scripts": {
     "build-icons": "mkdir -p icons && icon-gen -i icon.png -o icons",
-    "build:mac": "bun run build-icons && electron-builder --mac --universal -c.mac.identity=null",
+    "build:mac": "bun run build-icons && electron-builder --mac --universal -c.mac.identity=null --publish never",
     "build:win": "bun run build-icons && electron-builder --win",
     "build:linux": "bun run build-icons && electron-builder --linux"
   }
