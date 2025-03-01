@@ -124,14 +124,9 @@ jobs:
         run: bun run build:mac
 
       - name: Upload macOS Release Asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/hamster-run-1.0.0-universal-mac.zip
-          asset_name: macos-build.zip
-          asset_content_type: application/zip
+        run: gh release upload ${{ needs.create_release.outputs.tag_name }} dist/hamster-run-1.0.0-universal-mac.zip --clobber
 
   build-linux:
     runs-on: ubuntu-latest
