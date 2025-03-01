@@ -92,7 +92,7 @@ jobs:
 
       - name: Zip Build Artifact
         run: |
-          powershell Compress-Archive -Path electron/dist/power_troll.exe -DestinationPath electron/dist/windows-build.zip
+          powershell Compress-Archive -Path dist/hamster_run.exe -DestinationPath electron/dist/windows-build.zip
 
       - name: Upload Windows Release Asset
         uses: actions/upload-release-asset@v1
