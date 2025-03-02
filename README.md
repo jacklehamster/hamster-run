@@ -1,5 +1,7 @@
 # Hamster Run
 
+[![Build and Release](https://github.com/jacklehamster/hamster-run/actions/workflows/build.yml/badge.svg)](https://github.com/jacklehamster/hamster-run/actions/workflows/build.yml)
+
 This repository contains the source code for the "Hamster Run" game, which serves as a tutorial for game development using pure VanillaJS.
 
 ## Overview
