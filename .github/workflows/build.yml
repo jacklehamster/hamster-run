@@ -46,17 +46,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           script: |
-            const fs = require('fs');
             const { data: releases } = await github.rest.repos.listReleases({
               owner: context.repo.owner,
               repo: context.repo.repo
             });
             const release = releases.find(r => r.tag_name === process.env.TAG_NAME);
             if (release) {
-              fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_exists=true\n`);
-              fs.appendFileSync(process.env.GITHUB_OUTPUT, `upload_url=${release.upload_url}\n`);
+              core.setOutput('release_exists', 'true');
+              core.setOutput('upload_url', release.upload_url);
             } else {
-              fs.appendFileSync(process.env.GITHUB_OUTPUT, `release_exists=false\n`);
+              core.setOutput('release_exists', 'false');
             }
 
       - name: Create Release
