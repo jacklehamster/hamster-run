@@ -2,6 +2,7 @@ name: Build and Release
 
 # This workflow requires permission set to write on:
 # https://github.com/jacklehamster/hamster-run/settings/actions
+# Create fine-grained permissions for this workflow to run. (Read/Write on contents)
 
 on:
   push:

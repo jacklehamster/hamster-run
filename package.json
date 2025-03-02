@@ -7,6 +7,7 @@
     "email": "jacklehamster@gmail.com"
   },
   "main": "main.js",
+  "type": "module",
   "build": {
     "appId": "net.dobuki.hamster-run",
     "mac": {
@@ -47,6 +48,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
+    "start": "electron .",
     "build-icons": "mkdir -p icons && icon-gen -i icon.png -o icons",
     "build:mac": "bun run build-icons && electron-builder --mac --universal -c.mac.identity=null --publish never",
     "build:win": "bun run build-icons && electron-builder --win",
