@@ -17,9 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      tag_name: ${{ steps.create_release.outputs.tag_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,7 +65,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }} - ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
 
