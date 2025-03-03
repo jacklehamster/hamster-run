@@ -16,6 +16,8 @@ To get started with the Hamster Run tutorial, follow the instructions provided i
 
 You can try the game here: https://jacklehamster.github.io/hamster-run/
 
+![Hamster run](hamster-run.gif)
+
 ## Features
 
 - Developed using pure VanillaJS
