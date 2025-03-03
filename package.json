@@ -43,7 +43,7 @@
     "electron": "^34.3.0",
     "electron-builder": "^25.1.8",
     "icon-gen": "^5.0.0",
-    "imageoptim-cli": "^3.1.9"
+    "imageoptim-cli": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
