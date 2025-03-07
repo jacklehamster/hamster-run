@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trees.forEach((tree) => {
       ctx.drawImage(
         image,
-        3 * 512,
+        7 * 512,
         0,
         512,
         512,
