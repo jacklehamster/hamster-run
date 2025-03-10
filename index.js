@@ -16,7 +16,7 @@ const ANIM = {
   },
   TREE: [6],
 };
-const image = new Image();
+const image = document.createElement("img");
 image.src = "hamster.png";
 
 function jump(hamster) {
