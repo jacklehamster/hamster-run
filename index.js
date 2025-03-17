@@ -1,59 +1,49 @@
 const GROUND = 300;
 const GRAVITY = 1;
-const HAMSTER_SPEED = 5;
 const TREE_TOP = 170;
-
+const HAMSTER_SPEED = 5;
 const ANIM = {
   HAMSTER: {
-    STILL: {
-      LEFT: [3],
+    IDLE: {
       RIGHT: [0],
+      LEFT: [3],
     },
     RUN: {
-      LEFT: [3, 4, 5],
       RIGHT: [0, 1, 2],
+      LEFT: [3, 4, 5],
     },
   },
   TREE: [6],
 };
+
 const image = document.createElement("img");
 image.src = "hamster.png";
 
 function jump(hamster) {
-  hamster.grounded = false;
   hamster.dy = -20;
 }
 
-function highlightFocusedWindow() {
-  document.body.style.border = "5px solid white";
-  window.addEventListener("focus", (e) => {
-    document.body.style.border = "5px solid red";
-  });
-  window.addEventListener("blur", (e) => {
-    document.body.style.border = "5px solid white";
-  });
-}
-
-function handleControls(hamster, gameInfo, keys) {
+function handleKeyboardControl(keys, gameInfo, hamster, trees) {
   document.addEventListener("keydown", (e) => {
     e.preventDefault();
     if (!keys[e.code]) {
-      keys[e.code] = Date.now();
+      keys[e.code] = true;
     }
-    if (e.code === "Space") {
-      if (gameInfo.gameOver) {
-        if (Date.now() - gameInfo.gameOver > 500) {
-          gameInfo.gameOver = 0;
-          gameInfo.score = 0;
-          trees.forEach((tree) => {
-            tree.x = 300;
-          });
-          return;
-        }
-      } else {
-        if (hamster.grounded) {
-          jump(hamster);
-        }
+
+    if (gameInfo.gameOver) {
+      if (Date.now() - gameInfo.gameOver > 500) {
+        gameInfo.gameOver = 0;
+        gameInfo.score = 0;
+        trees.forEach((tree, i) => {
+          tree.x = 800 + i * 300;
+          tree.passed = false;
+        });
+        hamster.y = 300;
+        hamster.dy = 0;
+      }
+    } else if (e.code === "Space") {
+      if (hamster.y >= GROUND) {
+        jump(hamster);
       }
     }
   });
@@ -62,7 +52,7 @@ function handleControls(hamster, gameInfo, keys) {
   });
 }
 
-function handleHamsterMove(hamster, keys) {
+function moveHamster(hamster, keys) {
   let dx = 0;
   if (keys.ArrowLeft || keys.KeyA) {
     dx--;
@@ -70,103 +60,83 @@ function handleHamsterMove(hamster, keys) {
   if (keys.ArrowRight || keys.KeyD) {
     dx++;
   }
-  if (dx !== 0) {
+  if (dx) {
     hamster.direction = dx;
   }
-
-  const speed = HAMSTER_SPEED * (hamster.grounded ? 1 : 1.2);
-
-  hamster.dx = dx * speed;
-  hamster.x += hamster.dx;
+  hamster.dx = dx * HAMSTER_SPEED;
   hamster.y += hamster.dy;
+  hamster.x += hamster.dx;
   hamster.dy += GRAVITY;
   if (hamster.y > GROUND) {
     hamster.y = GROUND;
     hamster.dy = 0;
-    hamster.grounded = true;
   }
 }
 
-function drawHamster(ctx, hamster, gameInfo, shift) {
-  const globalFrame = Math.floor(Date.now() / 50);
+function moveTree(tree, hamster, gameInfo, scoreDiv) {
+  // tree.x -= 10;
+  // if (tree.x < hamster.x && !tree.passed) {
+  //   if (hamster.y < TREE_TOP) {
+  //     gameInfo.score++;
+  //     tree.passed = true;
+  //     scoreDiv.textContent = `SCORE: ${gameInfo.score}`;
+  //   } else if (!gameInfo.gameOver) {
+  //     gameInfo.gameOver = Date.now();
+  //   }
+  // }
+  // if (tree.x < -150) {
+  //   tree.x = 800 + Math.random() * 3000;
+  //   tree.passed = false;
+  // }
+}
+
+function drawCollisionBox(ctx, element) {
+  ctx.fillStyle = "rgb(255, 255, 255, 0.3)";
+  const collisionRect = [
+    element.x + element.collision[0],
+    element.y + element.collision[1],
+    element.collision[2],
+    element.collision[3],
+  ];
+  ctx.fillRect(...collisionRect);
+}
+
+function drawHamster(ctx, hamster, gameInfo) {
+  const state = hamster.dx ? "RUN" : "IDLE";
   const direction = hamster.direction > 0 ? "RIGHT" : "LEFT";
-  const state = hamster.dx ? "RUN" : "STILL";
+
   const animation = ANIM.HAMSTER[state][direction];
+  const frame = Math.floor((Date.now() / 100) % animation.length);
   const shake = gameInfo.gameOver ? 100 - 50 : 0;
 
-  const area = collisionArea(hamster, shift);
-  ctx.fillStyle = hamster.colliding
-    ? "rgba(255, 0, 0, .3)"
-    : "rgba(255, 255, 255, 0.3)";
-  ctx.fillRect(...area);
+  drawCollisionBox(ctx, hamster);
 
   ctx.drawImage(
     image,
-    0 + animation[globalFrame % animation.length] * 512,
+    0 + animation[frame] * 512,
     0,
     512,
     512,
-    shift.x + hamster.x + shake * Math.random(),
-    shift.y + hamster.y - 55 + shake * Math.random(),
+    hamster.x + shake * Math.random(),
+    hamster.y - 55 + shake * Math.random(),
     100,
     100
   );
 }
 
-function drawTree(ctx, tree, shift) {
-  const area = collisionArea(tree, shift);
-  ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-  ctx.fillRect(...area);
-
+function drawTree(ctx, tree) {
+  drawCollisionBox(ctx, tree);
   ctx.drawImage(
     image,
-    6 * 512,
+    ANIM.TREE[0] * 512,
     0,
     512,
     512,
-    shift.x + tree.x,
-    shift.y + tree.y - TREE_TOP,
+    tree.x,
+    tree.y - TREE_TOP,
     150,
     200
   );
-}
-
-function collisionArea(elem, shift) {
-  return [
-    shift.x + elem.x + elem.collisionBox[0],
-    shift.y + elem.y + elem.collisionBox[1],
-    elem.collisionBox[2],
-    elem.collisionBox[3],
-  ];
-}
-
-function checkCollisionPush(elem1, elem2, shift) {
-  const [left1, top1, w1, h1] = collisionArea(elem1, shift);
-  const [left2, top2, w2, h2] = collisionArea(elem2, shift);
-  const right1 = left1 + w1;
-  const right2 = left2 + w2;
-  const bottom1 = top1 + h1;
-  const bottom2 = top2 + h2;
-
-  const colliding =
-    left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2;
-  if (!colliding) {
-    return null;
-  }
-  const pushLeft = right1 - left2;
-  const pushRight = right2 - left1;
-  const pushTop = bottom1 - top2;
-  const pushBottom = bottom2 - top1;
-  return {
-    xPush: pushLeft < pushRight ? -pushLeft : pushRight,
-    yPush: pushTop < pushBottom ? -pushTop : pushBottom,
-  };
-}
-
-function focusOnHamster(shift, hamster) {
-  const dx = -hamster.x + 300 - shift.x;
-  shift.x += dx * 0.1;
-  // shift.y = -hamster.y + 200;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -175,11 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const gameInfo = {
     gameOver: 0,
-  };
-
-  const shift = {
-    x: 0,
-    y: 0,
+    score: 0,
   };
 
   const hamster = {
@@ -188,64 +154,33 @@ document.addEventListener("DOMContentLoaded", () => {
     dx: 0,
     dy: 0,
     direction: 1,
-    collisionBox: [15, -10, 70, 35],
+    collision: [15, -10, 72, 33],
   };
 
-  const trees = [
-    {
-      x: 300,
-      y: 325,
-      collisionBox: [45, -145, 60, 150],
-    },
-    {
-      x: 500,
-      y: 325 - 100,
-      collisionBox: [45, -145, 60, 150],
-    },
-    {
-      x: 800,
-      y: 325,
-      collisionBox: [45, -145, 60, 150],
-    },
-  ];
+  const trees = [0].map(() => ({
+    x: 500,
+    y: 325,
+    collision: [45, -145, 65, 150],
+  }));
 
   const scoreDiv = document.querySelector("#score");
-  scoreDiv.style.display = "none";
 
   const skyGradient = ctx.createLinearGradient(0, 0, 0, 300);
   skyGradient.addColorStop(0, "lightblue");
   skyGradient.addColorStop(1, "#88aaff");
 
   const keys = {};
-
-  handleControls(hamster, gameInfo, keys);
-  highlightFocusedWindow();
+  handleKeyboardControl(keys, gameInfo, hamster, trees);
 
   function loop() {
     //  Movement
     if (!gameInfo.gameOver) {
-      handleHamsterMove(hamster, keys);
+      moveHamster(hamster, keys);
+
+      trees.forEach((tree) => {
+        moveTree(tree, hamster, gameInfo, scoreDiv);
+      });
     }
-
-    //  Collision
-    delete hamster.colliding;
-    trees.forEach((tree) => {
-      const collisionPush = checkCollisionPush(hamster, tree, shift);
-      if (collisionPush) {
-        hamster.colliding = true;
-        console.log(collisionPush);
-        if (Math.abs(collisionPush.xPush) < Math.abs(collisionPush.yPush)) {
-          hamster.x += collisionPush.xPush;
-          hamster.dx = 0;
-        } else {
-          hamster.y += collisionPush.yPush;
-          hamster.dy = 0;
-          hamster.grounded = true;
-        }
-      }
-    });
-
-    focusOnHamster(shift, hamster);
 
     //  Drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -256,10 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = "green";
     ctx.fillRect(0, 320, canvas.width, 120);
 
-    drawHamster(ctx, hamster, gameInfo, shift);
+    drawHamster(ctx, hamster, gameInfo);
 
     trees.forEach((tree) => {
-      drawTree(ctx, tree, shift);
+      drawTree(ctx, tree);
     });
 
     requestAnimationFrame(loop);
@@ -268,17 +203,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const globalData = {
     keys,
-    shift,
     gameInfo,
     hamster,
     trees,
   };
-  const infoDiv = document.body.appendChild(document.createElement("div"));
-  infoDiv.style.whiteSpace = "pre";
-  infoDiv.style.fontFamily = "monospace";
-  function updateInfo() {
-    infoDiv.textContent = JSON.stringify(globalData, null, 2);
-    requestAnimationFrame(updateInfo);
+
+  const globalDataDiv = document.body.appendChild(
+    document.createElement("div")
+  );
+  globalDataDiv.style.height = "500px";
+  globalDataDiv.style.width = "100%";
+  globalDataDiv.style.height = "100%";
+  globalDataDiv.style.backgroundColor = "#ccc";
+  globalDataDiv.style.whiteSpace = "pre-wrap";
+  globalDataDiv.style.overflow = "auto";
+  globalDataDiv.style.fontFamily = "monospace";
+
+  function refreshGlobalData() {
+    globalDataDiv.textContent = JSON.stringify(globalData, null, 2);
+    requestAnimationFrame(refreshGlobalData);
   }
-  requestAnimationFrame(updateInfo);
+  refreshGlobalData();
 });
