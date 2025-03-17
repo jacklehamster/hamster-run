@@ -24,6 +24,11 @@ You can try the game here: https://jacklehamster.github.io/hamster-run/
 - Step-by-step tutorial for beginners
 - No external libraries or frameworks required
 
+## Docs
+
+This project is used as an example for this tutorial:
+https://dev.to/jacklehamster/publish-your-web-game-to-steam-using-electron-670
+
 ## Contributing
 
 We welcome contributions to enhance the game and tutorial. To contribute, please fork the repository, create a new branch, and submit a pull request with your changes.
